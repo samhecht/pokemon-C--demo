@@ -41,13 +41,18 @@ app.get('/getTypes', (req, res) => {
 });
 
 app.get('/goodAgainst', (req, res) => {
-    const poke_name = req_.query.pokeName;
+    const poke_name = req.query.pokeName;
     async function getGoodAgainst() {
         try {
             const types = await queries.get_pokemon_types({poke_name: poke_name}, adapter);
-            const goodAgainstTypes = await queries.get_good_against_types({user_type: types}, adapter);
-            const pokeIds = await queries.get_poke_ids_from_types({poke_type: goodAgainstTypes}, adapter);
-            const names = await queries.get_names_from_ids({poke_id: pokeIds}, adapter);
+            let filteredTypes = types.map(type => {
+                return type["poke_type"];
+            });
+            const goodAgainstTypes = await queries.get_good_against_types({user_type: filteredTypes}, adapter);
+            let filteredFoes = goodAgainstTypes.map(type => type.foe_type);
+            const pokeIds = await queries.get_poke_ids_from_types({poke_type: filteredFoes}, adapter);
+            let filteredIds = pokeIds.map(id => id.poke_id);
+            const names = await queries.get_names_from_ids({poke_id: filteredIds}, adapter);
             res.send(names);
 
         } catch {
