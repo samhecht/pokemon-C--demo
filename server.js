@@ -54,6 +54,7 @@ app.get('/goodAgainst', (req, res) => {
             res.send("couldn't get pokemon")
         }
     }
+    getGoodAgainst();
 });
 
 app.listen(port, () => {
