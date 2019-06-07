@@ -27,16 +27,33 @@ app.get('/', (req, res) => {
 	res.send('hello world');
 });
 
-app.get('/allUsers', (req, res) => {
-	async function getAllUsers() {
+app.get('/getTypes', (req, res) => {
+    const poke_name = req.query.pokeName;
+	async function getTypes() {
 		try {
-			const users = await queries.get_all_users({}, adapter);
-			res.send(users);
+			const types = await queries.get_pokemon_types({poke_name: poke_name}, adapter);
+			res.send(types);
 		} catch {
-			res.send('couldn\'t get users');
+			res.send('couldn\'t get types');
 		}
 	}
-	getAllUsers();
+	getTypes();
+});
+
+app.get('/goodAgainst', (req, res) => {
+    const poke_name = req_.query.pokeName;
+    async function getGoodAgainst() {
+        try {
+            const types = await queries.get_pokemon_types({poke_name: poke_name}, adapter);
+            const goodAgainstTypes = await queries.get_good_against_types({user_type: types}, adapter);
+            const pokeIds = await queries.get_poke_ids_from_types({poke_type: goodAgainstTypes}, adapter);
+            const names = await queries.get_names_from_ids({poke_id: pokeIds}, adapter);
+            res.send(names);
+
+        } catch {
+            res.send("couldn't get pokemon")
+        }
+    }
 });
 
 app.listen(port, () => {
